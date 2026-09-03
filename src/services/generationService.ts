@@ -9,7 +9,7 @@ import {
   SourceStats,
   validateGenerationRequest,
 } from '../models/generation.js';
-import { getAdapter, getSourceConfigById } from '../sources/registry.js';
+import { getAdapter, getSourceConfigById, listFirestoreSourceConfigs } from '../sources/registry.js';
 import {
   compareNormalizedEvents,
   isWithinShiftWindow,
@@ -20,6 +20,7 @@ import {
   classify_record,
 } from './classificationService.js';
 import { HandoverNote } from '../models/handover.js';
+import { saveHandoverHistory } from './historyService.js';
 
 export class GenerationValidationError extends Error {
   public errors: string[];
@@ -55,6 +56,13 @@ export async function fetch_and_filter_events(
   const validation = validateGenerationRequest(request);
   if (!validation.valid) {
     throw new GenerationValidationError(validation.errors);
+  }
+
+  // Preload any dynamically registered Firestore source configs
+  try {
+    await listFirestoreSourceConfigs();
+  } catch {
+    // Non-blocking fallback
   }
 
   const shiftStartEpochMs = Date.parse(request.shift_start);
@@ -319,6 +327,15 @@ export async function fetch_and_filter_events(
     warnings,
     errors
   );
+
+  // 10. Persist generated handover note to Firestore history
+  if (handoverNote && overallStatus === 'ready') {
+    try {
+      await saveHandoverHistory(handoverNote);
+    } catch (err) {
+      console.warn('[GenerationService] Could not persist handover note history to Firestore:', err);
+    }
+  }
 
   const durationMs = Date.now() - startTime;
 

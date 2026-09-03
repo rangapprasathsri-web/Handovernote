@@ -8,6 +8,8 @@ import {
 } from './src/services/generationService.js';
 import { generateHandoverFilename, generateHandoverPdf } from './src/services/pdfService.js';
 import { getSourcePreview, listSources } from './src/services/sourceService.js';
+import { getHandoverHistoryById, listHandoverHistory } from './src/services/historyService.js';
+import { validateFirebaseCredentials } from './src/config/firebase.js';
 
 async function startServer() {
   const app = express();
@@ -24,6 +26,17 @@ async function startServer() {
       version: '1.0.0',
       timestamp: new Date().toISOString(),
     });
+  });
+
+  // 1b. Firebase Credentials & Connectivity Validation endpoint
+  app.get('/api/firebase/validate', async (_req, res) => {
+    try {
+      const result = await validateFirebaseCredentials();
+      res.json(result);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      res.status(500).json({ valid: false, error: msg });
+    }
   });
 
   // 2. Sources configuration endpoint
@@ -107,6 +120,62 @@ async function startServer() {
       });
     }
   });
+
+  // 6. List saved handover notes (paginated, most recent first, with optional source/date filters)
+  app.get('/api/handovers', async (req, res) => {
+    try {
+      const page = req.query.page ? Number(req.query.page) : 1;
+      const limit = req.query.limit ? Number(req.query.limit) : 20;
+      const source = typeof req.query.source === 'string' ? req.query.source : undefined;
+      const startDate =
+        typeof req.query.start_date === 'string'
+          ? req.query.start_date
+          : typeof req.query.startDate === 'string'
+            ? req.query.startDate
+            : undefined;
+      const endDate =
+        typeof req.query.end_date === 'string'
+          ? req.query.end_date
+          : typeof req.query.endDate === 'string'
+            ? req.query.endDate
+            : undefined;
+
+      const history = await listHandoverHistory({
+        page,
+        limit,
+        source,
+        startDate,
+        endDate,
+      });
+
+      res.json(history);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      res.status(500).json({ error: 'Failed to list handover history', details: [msg] });
+    }
+  });
+
+  // 7. Get single saved handover note by ID
+  app.get('/api/handovers/:id', async (req, res) => {
+    try {
+      const record = await getHandoverHistoryById(req.params.id);
+      if (!record) {
+        res.status(404).json({ error: `Handover note with ID '${req.params.id}' not found` });
+        return;
+      }
+
+      // Return the saved note matching the HandoverNote contract expected by /api/handover/pdf
+      res.json({
+        ...record.note,
+        id: record.id,
+        handover_id: record.id,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      res.status(500).json({ error: 'Failed to fetch handover note', details: [msg] });
+    }
+  });
+
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {

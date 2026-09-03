@@ -5,6 +5,14 @@ import { NormalizedEvent } from '../models/events.js';
 import { SourceConfig } from '../models/sourceConfig.js';
 import { IncidentAdapter, incidentsAdapter } from './incidentsAdapter.js';
 import { TicketingAdapter, ticketingAdapter } from './ticketingAdapter.js';
+import { FirestoreAdapter, firestoreAdapter } from './firestoreAdapter.js';
+import {
+  listFirestoreSourceConfigs,
+  getDynamicSourceConfigs,
+  getDynamicSourceConfigById,
+  registerDynamicSourceConfig,
+  clearDynamicSourceConfigs,
+} from './firestoreSourceRegistry.js';
 import { SourceAdapter } from './types.js';
 
 // Simple adapter for quiet/empty testing sources
@@ -15,9 +23,9 @@ class QuietOpsAdapter implements SourceAdapter<any> {
   public readonly display_name = 'Quiet Ops Queue (Empty)';
 
   async loadSourceEvents(config: SourceConfig): Promise<any[]> {
-    const resolvedPath = path.isAbsolute(config.path)
-      ? config.path
-      : path.resolve(process.cwd(), config.path);
+    const resolvedPath = path.isAbsolute(config.path || '')
+      ? config.path!
+      : path.resolve(process.cwd(), config.path || '');
     try {
       const fileData = await fs.readFile(resolvedPath, 'utf-8');
       const parsed = JSON.parse(fileData);
@@ -44,20 +52,29 @@ const adapters: Record<string, SourceAdapter<any>> = {
   ticketing: ticketingAdapter,
   incidents: incidentsAdapter,
   quiet_ops: new QuietOpsAdapter(),
+  firestore: firestoreAdapter,
 };
 
 /**
  * Retrieves the adapter for a given source ID.
+ * Resolves static adapters or binds dynamic Firestore sources to firestoreAdapter.
  */
 export function getAdapter(sourceId: string): SourceAdapter<any> | undefined {
-  return adapters[sourceId];
+  if (adapters[sourceId]) {
+    return adapters[sourceId];
+  }
+  const config = getSourceConfigById(sourceId);
+  if (config?.type === 'firestore') {
+    return firestoreAdapter;
+  }
+  return undefined;
 }
 
 /**
  * Checks if a source ID is registered.
  */
 export function hasSource(sourceId: string): boolean {
-  return Boolean(adapters[sourceId]);
+  return Boolean(getAdapter(sourceId));
 }
 
 /**
@@ -72,17 +89,26 @@ export async function loadSourceEvents(config: SourceConfig): Promise<unknown[]>
 }
 
 /**
- * Returns all configured source specifications.
+ * Returns all configured source specifications (static seeded sources + dynamic Firestore sources).
  */
 export function getAllSourceConfigs(): SourceConfig[] {
-  return REGISTERED_SOURCES;
+  return [...REGISTERED_SOURCES, ...getDynamicSourceConfigs()];
 }
 
 /**
- * Looks up a SourceConfig by ID.
+ * Looks up a SourceConfig by ID (checking static seeded sources first, then dynamic Firestore sources).
  */
 export function getSourceConfigById(id: string): SourceConfig | undefined {
-  return REGISTERED_SOURCES.find((s) => s.id === id);
+  return REGISTERED_SOURCES.find((s) => s.id === id) || getDynamicSourceConfigById(id);
 }
 
-export { TicketingAdapter, IncidentAdapter };
+export {
+  TicketingAdapter,
+  IncidentAdapter,
+  FirestoreAdapter,
+  firestoreAdapter,
+  listFirestoreSourceConfigs,
+  registerDynamicSourceConfig,
+  clearDynamicSourceConfigs,
+};
+

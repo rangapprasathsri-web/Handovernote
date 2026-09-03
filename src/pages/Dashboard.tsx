@@ -5,16 +5,33 @@ import { GenerationStatus } from '../components/GenerationStatus.js';
 import { GenerationResultView } from '../components/GenerationResultView.js';
 import { ShiftWindowForm } from '../components/ShiftWindowForm.js';
 import { SourceInspector } from '../components/SourceInspector.js';
+import { HandoverHistoryView } from '../components/HandoverHistoryView.js';
 import { REGISTERED_SOURCES } from '../config/sources.js';
 import { GenerationRequest, GenerationResult } from '../models/generation.js';
 import { SourceConfig } from '../models/sourceConfig.js';
 
 export const Dashboard: React.FC = () => {
   const [sources, setSources] = useState<SourceConfig[]>(REGISTERED_SOURCES);
+  const [activeTab, setActiveTab] = useState<'generator' | 'history'>('generator');
+  const [historyCount, setHistoryCount] = useState<number>(0);
   const [generationState, setGenerationState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string[]>([]);
   const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
+
+  const fetchHistoryCount = async () => {
+    try {
+      const res = await fetch('/api/handovers?limit=1');
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.total === 'number') {
+          setHistoryCount(data.total);
+        }
+      }
+    } catch {
+      // Non-critical
+    }
+  };
 
   useEffect(() => {
     // Attempt to load live sources from server
@@ -32,6 +49,7 @@ export const Dashboard: React.FC = () => {
       }
     };
     fetchSources();
+    fetchHistoryCount();
   }, []);
 
   const handleGenerate = async (request: GenerationRequest) => {
@@ -60,6 +78,7 @@ export const Dashboard: React.FC = () => {
 
       setGenerationState('success');
       setGenerationResult(data as GenerationResult);
+      fetchHistoryCount();
     } catch (err) {
       setGenerationState('error');
       const msg = err instanceof Error ? err.message : 'Network error communicating with server';
@@ -77,48 +96,59 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <AppShell>
-      {/* Page Title & Context Header */}
-      {!generationResult?.handover_note && (
-        <PageHeader
-          title="Create a shift handover note"
-          description="Bring together ticket updates, incident activity, and operational tasks from your shift window into a structured, single-file handover."
-        />
-      )}
-
-      {/* Status / Notice Banner */}
-      <GenerationStatus
-        status={generationState}
-        errorMessage={errorMessage}
-        errorDetails={errorDetails}
-        warnings={generationResult?.warnings}
-      />
-
-      {/* Dynamic Workflow: When result exists, show full-width Handover Preview */}
-      {generationResult?.handover_note ? (
-        <div className="flex flex-col gap-6">
-          <GenerationResultView result={generationResult} onReset={handleReset} />
-        </div>
+    <AppShell
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      historyCount={historyCount}
+    >
+      {activeTab === 'history' ? (
+        <HandoverHistoryView onBackToGenerator={() => setActiveTab('generator')} />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Form Controls (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            <ShiftWindowForm
-              availableSources={sources}
-              onSubmit={handleGenerate}
-              isLoading={generationState === 'loading'}
+        <>
+          {/* Page Title & Context Header */}
+          {!generationResult?.handover_note && (
+            <PageHeader
+              title="Create a shift handover note"
+              description="Bring together ticket updates, incident activity, and operational tasks from your shift window into a structured, single-file handover."
             />
-          </div>
+          )}
 
-          {/* Right Column: Handover Overview (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col gap-6">
-            <GenerationResultView result={generationResult} onReset={handleReset} />
-          </div>
-        </div>
+          {/* Status / Notice Banner */}
+          <GenerationStatus
+            status={generationState}
+            errorMessage={errorMessage}
+            errorDetails={errorDetails}
+            warnings={generationResult?.warnings}
+          />
+
+          {/* Dynamic Workflow: When result exists, show full-width Handover Preview */}
+          {generationResult?.handover_note ? (
+            <div className="flex flex-col gap-6">
+              <GenerationResultView result={generationResult} onReset={handleReset} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column: Form Controls (5 cols) */}
+              <div className="lg:col-span-5 flex flex-col gap-6">
+                <ShiftWindowForm
+                  availableSources={sources}
+                  onSubmit={handleGenerate}
+                  isLoading={generationState === 'loading'}
+                />
+              </div>
+
+              {/* Right Column: Handover Overview (7 cols) */}
+              <div className="lg:col-span-7 flex flex-col gap-6">
+                <GenerationResultView result={generationResult} onReset={handleReset} />
+              </div>
+            </div>
+          )}
+
+          {/* Secondary Section: Source Data & Schema Contract Explorer */}
+          <SourceInspector sources={sources} />
+        </>
       )}
-
-      {/* Secondary Section: Source Data & Schema Contract Explorer */}
-      <SourceInspector sources={sources} />
     </AppShell>
   );
 };
+

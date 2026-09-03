@@ -1,0 +1,112 @@
+[
+  {
+    "incident_id": "INC-9088",
+    "reported_at": "2026-09-02T14:00:00+05:30",
+    "headline": "Core network switch firmware update in Singapore DC",
+    "incident_state": "closed",
+    "priority": "high",
+    "severity": "p2",
+    "incident_commander": "network-team@example.com",
+    "impact_summary": "Yesterday event: Planned redundant routing switch firmware successfully patched.",
+    "subsystem": "network"
+  },
+  {
+    "incident_id": "INC-9099",
+    "reported_at": "2026-09-03T17:00:00+05:30",
+    "headline": "Shift handover operational ingress queue verification",
+    "incident_state": "resolved",
+    "priority": "low",
+    "severity": "p4",
+    "incident_commander": "priya.nair@example.com",
+    "impact_summary": "Executed exactly at shift start (17:00:00+05:30) to test inclusive lower boundary.",
+    "subsystem": "infra"
+  },
+  {
+    "incident_id": "INC-9100",
+    "reported_at": "2026-09-03T17:10:00+05:30",
+    "headline": "Automated failover drill for secondary replica database",
+    "incident_state": "resolved",
+    "priority": "low",
+    "severity": "p4",
+    "incident_commander": "priya.nair@example.com",
+    "impact_summary": "Routine completed work: Standby replica promoted without transaction loss; total drill duration 4.2s.",
+    "subsystem": "database"
+  },
+  {
+    "incident_id": "INC-9101",
+    "reported_at": "2026-09-03T17:35:00+05:30",
+    "headline": "Major latency spike on payment webhook processing",
+    "incident_state": "investigating",
+    "priority": "critical",
+    "severity": "p1",
+    "incident_commander": "ananya.sharma@example.com",
+    "impact_summary": "Escalated blocker: P1 incident. Downstream banking gateway returning 504 timeouts. 14% of payment callbacks affected.",
+    "subsystem": "payments"
+  },
+  {
+    "incident_id": "INC-9102",
+    "reported_at": "2026-09-03T18:20:00+05:30",
+    "headline": "SSL certificate renewal verification on internal ingress DNS",
+    "incident_state": "in_progress",
+    "priority": "medium",
+    "severity": "p3",
+    "incident_commander": "vikram.singh@example.com",
+    "impact_summary": "Active work in progress: Renewed wildcard cert deployed to staging cluster. Preparing canary deployment.",
+    "subsystem": "ingress"
+  },
+  {
+    "incident_id": "INC-9102",
+    "reported_at": "2026-09-03T19:10:00+05:30",
+    "headline": "SSL certificate renewal verification on internal ingress DNS (canary deployed)",
+    "incident_state": "verifying",
+    "priority": "medium",
+    "severity": "p3",
+    "incident_commander": "vikram.singh@example.com",
+    "impact_summary": "Update to INC-9102: Canary routing enabled on 10% traffic. Zero handshake failures recorded over 30 mins.",
+    "subsystem": "ingress"
+  },
+  {
+    "incident_id": "INC-9103",
+    "reported_at": "2026-09-03T19:30:00+05:30",
+    "headline": "Spike in 502 Bad Gateway responses from partner API relay",
+    "incident_state": "monitoring",
+    "priority": "high",
+    "severity": "p2",
+    "incident_commander": "rohit.patel@example.com",
+    "impact_summary": "Watch-list item: Alert fired on edge relay error budget. Partner notified; connection pool recycle underway.",
+    "subsystem": "partner-api"
+  },
+  {
+    "incident_id": "INC-9105",
+    "reported_at": "2026-09-03T20:00:00+05:30",
+    "headline": "Post-shift canary verification completed",
+    "incident_state": "resolved",
+    "priority": "low",
+    "severity": "p4",
+    "incident_commander": "vikram.singh@example.com",
+    "impact_summary": "Reported exactly at shift end (20:00:00+05:30) to test exclusive upper boundary.",
+    "subsystem": "ingress"
+  },
+  {
+    "incident_id": "INC-9120",
+    "reported_at": "2026-09-04T06:00:00+05:30",
+    "headline": "Next morning scheduled disaster recovery synchronization drill",
+    "incident_state": "pending",
+    "priority": "low",
+    "severity": "p4",
+    "incident_commander": "ops-lead@example.com",
+    "impact_summary": "Future shift event: Bi-weekly cross-region failover drill scheduled for tomorrow morning.",
+    "subsystem": "infra"
+  },
+  {
+    "incident_id": "INC-9199",
+    "reported_at": "2026-09-03 18:00",
+    "headline": "Corrupted log entry from legacy proxy without timezone",
+    "incident_state": "investigating",
+    "priority": "medium",
+    "severity": "p3",
+    "incident_commander": null,
+    "impact_summary": "Naive timestamp missing timezone designator to verify resilient per-record skipping and diagnostic logging.",
+    "subsystem": "proxy"
+  }
+]

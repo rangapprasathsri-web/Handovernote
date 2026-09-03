@@ -9,10 +9,12 @@ export interface SourceConfig {
   id: string;
   /** Human-readable display name */
   name: string;
-  /** Type of adapter (e.g. 'seeded_json', 'api', 'webhook') */
-  type: 'seeded_json' | 'api' | 'webhook';
-  /** Path to the local seeded dataset (for seeded_json) or endpoint */
-  path: string;
+  /** Type of adapter (e.g. 'seeded_json', 'api', 'webhook', 'firestore') */
+  type: 'seeded_json' | 'api' | 'webhook' | 'firestore';
+  /** Path to the local seeded dataset (for seeded_json) or endpoint (optional when type is 'firestore') */
+  path?: string;
+  /** Firestore collection path (used instead of path when type is 'firestore') */
+  collection?: string;
   /** Whether the source is enabled and ready for querying */
   enabled: boolean;
   /** Optional descriptive note */
@@ -41,12 +43,23 @@ export function validateSourceConfig(config: unknown): SourceConfigValidationRes
     errors.push("Field 'name' is required and must be a non-empty string");
   }
 
-  if (c.type !== 'seeded_json' && c.type !== 'api' && c.type !== 'webhook') {
-    errors.push("Field 'type' must be one of: 'seeded_json', 'api', 'webhook'");
+  if (
+    c.type !== 'seeded_json' &&
+    c.type !== 'api' &&
+    c.type !== 'webhook' &&
+    c.type !== 'firestore'
+  ) {
+    errors.push("Field 'type' must be one of: 'seeded_json', 'api', 'webhook', 'firestore'");
   }
 
-  if (typeof c.path !== 'string' || c.path.trim() === '') {
-    errors.push("Field 'path' is required and must be a non-empty string");
+  if (c.type === 'firestore') {
+    if (typeof c.collection !== 'string' || c.collection.trim() === '') {
+      errors.push("Field 'collection' is required and must be a non-empty string when type is 'firestore'");
+    }
+  } else {
+    if (typeof c.path !== 'string' || c.path.trim() === '') {
+      errors.push("Field 'path' is required and must be a non-empty string");
+    }
   }
 
   if (typeof c.enabled !== 'boolean') {
