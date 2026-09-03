@@ -9,8 +9,19 @@ import { HandoverHistoryView } from '../components/HandoverHistoryView.js';
 import { REGISTERED_SOURCES } from '../config/sources.js';
 import { GenerationRequest, GenerationResult } from '../models/generation.js';
 import { SourceConfig } from '../models/sourceConfig.js';
+import { UserProfile } from './LoginPage.js';
 
-export const Dashboard: React.FC = () => {
+export interface DashboardProps {
+  onNavigateToLanding?: () => void;
+  currentUser?: UserProfile | null;
+  onSignOut?: () => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({
+  onNavigateToLanding,
+  currentUser,
+  onSignOut,
+}) => {
   const [sources, setSources] = useState<SourceConfig[]>(REGISTERED_SOURCES);
   const [activeTab, setActiveTab] = useState<'generator' | 'history'>('generator');
   const [historyCount, setHistoryCount] = useState<number>(0);
@@ -100,6 +111,9 @@ export const Dashboard: React.FC = () => {
       activeTab={activeTab}
       onTabChange={setActiveTab}
       historyCount={historyCount}
+      onNavigateToLanding={onNavigateToLanding}
+      currentUser={currentUser}
+      onSignOut={onSignOut}
     >
       {activeTab === 'history' ? (
         <HandoverHistoryView onBackToGenerator={() => setActiveTab('generator')} />

@@ -9,43 +9,11 @@ import {
   ExternalLink,
   Layers,
   History,
-  Database,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
 } from 'lucide-react';
 import { HandoverHistoryRecord } from '../models/history.js';
 import { HandoverNote } from '../models/handover.js';
 import { HandoverPreview } from './HandoverPreview.js';
 import { DownloadActions } from './DownloadActions.js';
-
-interface FirebaseDiag {
-  valid: boolean;
-  projectId: string;
-  apiKeyStatus: {
-    provided: boolean;
-    maskedKey: string;
-    validFormat: boolean;
-    googleVerified: boolean;
-    message: string;
-  };
-  firestoreStatus: {
-    configured: boolean;
-    enabled: boolean;
-    databaseName: string;
-    message: string;
-  };
-  collections: {
-    handoversCollection: string;
-    sourceConfigsCollection: string;
-  };
-  detectedConfig: {
-    appId?: string;
-    storageBucket?: string;
-    messagingSenderId?: string;
-  };
-  recommendations: string[];
-}
 
 export interface HandoverHistoryViewProps {
   onBackToGenerator?: () => void;
@@ -61,28 +29,6 @@ export const HandoverHistoryView: React.FC<HandoverHistoryViewProps> = ({
   const [filterSource, setFilterSource] = useState<string>('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [firebaseDiag, setFirebaseDiag] = useState<FirebaseDiag | null>(null);
-  const [isDiagLoading, setIsDiagLoading] = useState(false);
-  const [showDiag, setShowDiag] = useState(false);
-
-  const fetchFirebaseDiag = async () => {
-    setIsDiagLoading(true);
-    try {
-      const res = await fetch('/api/firebase/validate');
-      if (res.ok) {
-        const data = await res.json();
-        setFirebaseDiag(data);
-      }
-    } catch {
-      // Non-critical
-    } finally {
-      setIsDiagLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchFirebaseDiag();
-  }, []);
 
   const fetchHistory = async () => {
     setIsLoading(true);
@@ -210,123 +156,10 @@ export const HandoverHistoryView: React.FC<HandoverHistoryViewProps> = ({
             Refresh
           </button>
 
-          <button
-            type="button"
-            id="btn-firebase-diag"
-            onClick={() => setShowDiag(!showDiag)}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border transition-colors cursor-pointer ${
-              firebaseDiag?.valid
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
-                : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5" />
-            <span>
-              {firebaseDiag?.valid
-                ? `Firebase: ${firebaseDiag.projectId}`
-                : 'Firebase Status'}
-            </span>
-          </button>
-
           <span className="text-xs text-slate-500 ml-auto">
             {total} {total === 1 ? 'handover archived' : 'handovers archived'}
           </span>
         </div>
-
-        {/* Firebase Diagnostics Panel */}
-        {showDiag && (
-          <div className="mt-4 p-4 rounded-xl border border-slate-200 bg-slate-50/70 text-xs text-slate-700 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-indigo-600" />
-                <span className="font-semibold text-slate-900 text-sm">
-                  Firebase Credentials &amp; Infrastructure Status
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={fetchFirebaseDiag}
-                disabled={isDiagLoading}
-                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-md transition-colors cursor-pointer"
-              >
-                <RefreshCw className={`w-3 h-3 ${isDiagLoading ? 'animate-spin' : ''}`} />
-                <span>Revalidate</span>
-              </button>
-            </div>
-
-            {firebaseDiag ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                <div className="p-3 bg-white rounded-lg border border-slate-200 flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Google Project ID</span>
-                    <span className="font-mono font-semibold text-slate-900">
-                      {firebaseDiag.projectId || 'Not set'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Web API Key</span>
-                    <span className="inline-flex items-center gap-1">
-                      {firebaseDiag.apiKeyStatus.googleVerified ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-700 font-medium">
-                          <CheckCircle2 className="w-3 h-3" /> Validated by Google
-                        </span>
-                      ) : (
-                        <span className="text-amber-700 font-medium">
-                          {firebaseDiag.apiKeyStatus.message}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Key Fingerprint</span>
-                    <span className="font-mono text-[11px] text-slate-600">
-                      {firebaseDiag.apiKeyStatus.maskedKey}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="p-3 bg-white rounded-lg border border-slate-200 flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Cloud Firestore DB</span>
-                    <span className="inline-flex items-center gap-1">
-                      {firebaseDiag.firestoreStatus.enabled ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-700 font-medium">
-                          <CheckCircle2 className="w-3 h-3" /> Active &amp; Ready
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-amber-700 font-medium">
-                          <AlertTriangle className="w-3 h-3" /> Setup Needed
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Active Collections</span>
-                    <span className="font-mono text-[11px] text-slate-700">
-                      {firebaseDiag.collections.handoversCollection}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    {firebaseDiag.firestoreStatus.message}
-                  </p>
-                </div>
-
-                {firebaseDiag.recommendations.length > 0 && (
-                  <div className="md:col-span-2 p-3 bg-amber-50/70 border border-amber-200/80 rounded-lg text-amber-900">
-                    <span className="font-semibold block mb-1">Recommended Next Steps:</span>
-                    <ul className="list-disc list-inside space-y-0.5">
-                      {firebaseDiag.recommendations.map((rec, idx) => (
-                        <li key={idx}>{rec}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-slate-500">Checking credentials...</p>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Error state */}

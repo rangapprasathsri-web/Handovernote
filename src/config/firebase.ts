@@ -147,20 +147,17 @@ export async function validateFirebaseCredentials(): Promise<FirebaseValidationR
   let firestoreMessage = '';
 
   try {
-    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${FIREBASE_HANDOVERS_COLLECTION}`;
     const res = await fetch(firestoreUrl + (apiKey ? `?key=${apiKey}` : ''));
-    if (res.status === 404) {
-      firestoreEnabled = false;
-      firestoreMessage = `Firestore Database not yet provisioned in project '${projectId}'.`;
-      recommendations.push(
-        `Open Firebase Console (https://console.firebase.google.com/project/${projectId}/firestore) and click "Create Database".`
-      );
-    } else if (res.status === 200) {
+    if (res.status === 200) {
       firestoreEnabled = true;
-      firestoreMessage = 'Cloud Firestore Database is active and reachable.';
-    } else {
-      const text = await res.text();
-      if (text.includes('PERMISSION_DENIED') || text.includes('not been used in project')) {
+      firestoreMessage = 'Cloud Firestore Database is provisioned, active, and accessible.';
+    } else if (res.status === 403) {
+      const data = await res.json().catch(() => null);
+      if (data?.error?.status === 'PERMISSION_DENIED' && data?.error?.message?.includes('Missing or insufficient permissions')) {
+        firestoreEnabled = true;
+        firestoreMessage = 'Cloud Firestore Database is created and active! (Protected by Firestore Security Rules)';
+      } else if (data?.error?.message?.includes('not been used in project')) {
         firestoreEnabled = false;
         firestoreMessage = `Firestore API not enabled for project '${projectId}'.`;
         recommendations.push(
@@ -168,8 +165,17 @@ export async function validateFirebaseCredentials(): Promise<FirebaseValidationR
         );
       } else {
         firestoreEnabled = true;
-        firestoreMessage = `Firestore endpoint responded with HTTP ${res.status}`;
+        firestoreMessage = `Cloud Firestore is active (Response: ${data?.error?.message || 'Access controlled'}).`;
       }
+    } else if (res.status === 404) {
+      firestoreEnabled = false;
+      firestoreMessage = `Firestore Database not yet provisioned in project '${projectId}'.`;
+      recommendations.push(
+        `Open Firebase Console (https://console.firebase.google.com/project/${projectId}/firestore) and click "Create Database".`
+      );
+    } else {
+      firestoreEnabled = true;
+      firestoreMessage = `Firestore endpoint responded with HTTP ${res.status}`;
     }
   } catch (err) {
     firestoreMessage = `Error probing Firestore endpoint: ${err instanceof Error ? err.message : String(err)}`;
