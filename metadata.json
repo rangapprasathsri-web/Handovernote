@@ -1,0 +1,6 @@
+{
+  "name": "Shift Handover Note Generator",
+  "description": "Production operations shift handover note generator. Ingests shift activity across ticketing and incidents, normalizes timestamps, deduplicates updates, classifies into four grounded sections, and exports structured PDF handover documents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

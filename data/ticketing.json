@@ -1,0 +1,112 @@
+[
+  {
+    "ticket_id": "OPS-4810",
+    "created_at": "2026-09-03T09:15:00+05:30",
+    "subject": "Morning routine queue audit and health verification",
+    "ticket_status": "closed",
+    "urgency": "low",
+    "assignee": "priya.nair@example.com",
+    "severity_level": "low",
+    "description": "Daily early morning health audit completed across APAC ingress points.",
+    "tags": ["maintenance", "routine"]
+  },
+  {
+    "ticket_id": "OPS-4819",
+    "created_at": "2026-09-03T17:00:00+05:30",
+    "subject": "Shift start operational queue audit and priority triage",
+    "ticket_status": "resolved",
+    "urgency": "medium",
+    "assignee": "priya.nair@example.com",
+    "severity_level": "low",
+    "description": "Executed at exactly shift start (17:00:00+05:30) to test inclusive lower boundary.",
+    "tags": ["boundary-start", "completed-work"]
+  },
+  {
+    "ticket_id": "OPS-4820",
+    "created_at": "2026-09-03T17:25:00+05:30",
+    "subject": "Routine database index maintenance on billing cluster",
+    "ticket_status": "resolved",
+    "urgency": "medium",
+    "assignee": "priya.nair@example.com",
+    "severity_level": "low",
+    "description": "Reindexed billing_transactions table to optimize evening batch processing.",
+    "tags": ["database", "completed-work"]
+  },
+  {
+    "ticket_id": "OPS-4821",
+    "created_at": "2026-09-03T17:45:00+05:30",
+    "subject": "Customer reported login failures on mobile app",
+    "ticket_status": "open",
+    "urgency": "high",
+    "assignee": null,
+    "severity_level": "high",
+    "description": "Initial report from support: iOS users in Mumbai region receiving 401 token invalidation.",
+    "tags": ["auth", "mobile", "incident-prep"]
+  },
+  {
+    "ticket_id": "OPS-4821",
+    "created_at": "2026-09-03T19:42:00+05:30",
+    "subject": "Customer reported login failures on mobile app (investigation update)",
+    "ticket_status": "in_progress",
+    "urgency": "high",
+    "assignee": "vikram.singh@example.com",
+    "severity_level": "high",
+    "description": "Root cause not yet found. Investigating OAuth provider token refresh latency and edge cache invalidation.",
+    "tags": ["auth", "mobile", "active-wip"]
+  },
+  {
+    "ticket_id": "OPS-4822",
+    "created_at": "2026-09-03T18:15:00+05:30",
+    "subject": "Storage gateway unreachable in AP-South-1",
+    "ticket_status": "escalated",
+    "urgency": "critical",
+    "assignee": "oncall-infra@example.com",
+    "severity_level": "critical",
+    "description": "Active escalated blocker: Primary S3 gateway mount flapping on storage-node-04. Blocking settlement sync.",
+    "tags": ["blocker", "storage", "escalated"]
+  },
+  {
+    "ticket_id": "OPS-4823",
+    "created_at": "2026-09-03T18:50:00+05:30",
+    "subject": "Memory pressure warning on analytics cache pod",
+    "ticket_status": "monitoring",
+    "urgency": "medium",
+    "assignee": "rajesh.kumar@example.com",
+    "severity_level": "medium",
+    "description": "Watch-list item: Redis cache pod memory at 84%. Auto-scaling policy primed; oncall to observe during peak.",
+    "tags": ["watchlist", "cache", "monitoring"]
+  },
+  {
+    "ticket_id": "OPS-4825",
+    "created_at": "2026-09-03T20:00:00+05:30",
+    "subject": "Post-shift analytics sync check",
+    "ticket_status": "open",
+    "urgency": "low",
+    "assignee": null,
+    "severity_level": "low",
+    "description": "Executed at exactly shift end (20:00:00+05:30) to test exclusive upper boundary.",
+    "tags": ["boundary-end", "excluded"]
+  },
+  {
+    "ticket_id": "OPS-4830",
+    "created_at": "2026-09-03T23:30:00+05:30",
+    "subject": "Scheduled night backup dry-run on analytical warehouse",
+    "ticket_status": "scheduled",
+    "urgency": "low",
+    "assignee": null,
+    "severity_level": "low",
+    "description": "Outside shift window: Nightly automated backup pipeline verification scheduled for midnight.",
+    "tags": ["scheduled", "future-window"]
+  },
+  {
+    "ticket_id": "OPS-4899",
+    "created_at": "invalid-timestamp-format",
+    "subject": "Corrupt ticket created by third party webhook",
+    "ticket_status": "open",
+    "urgency": "low",
+    "assignee": null,
+    "severity_level": "low",
+    "description": "Malformed timestamp test record to verify resilient per-record skipping and diagnostic logging.",
+    "tags": ["malformed", "test"]
+  }
+]
