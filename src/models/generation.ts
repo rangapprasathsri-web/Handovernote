@@ -18,25 +18,25 @@ export interface GenerationRequest {
 export interface SourceStats {
   /** Identifier of the source (e.g. 'ticketing') */
   source: string;
-  /** Legacy alias for source identifier (Step 1 compatibility) */
+  /** Primary source identifier */
   source_id: string;
   /** Human-readable display name */
   source_name: string;
   /** Total raw records fetched from the source fixture */
   fetched: number;
-  /** Alias for total fetched (Step 2 naming) */
+  /** Total records fetched from source */
   fetched_count: number;
   /** Records falling strictly inside the shift window [shift_start, shift_end) */
   included: number;
-  /** Alias for records included in window (Step 2 naming) */
+  /** Records included in window */
   included_count: number;
   /** Records excluded because they are outside the shift window */
   excluded: number;
-  /** Alias for records excluded out of window (Step 2 naming) */
+  /** Records excluded out of window */
   excluded_out_of_window_count: number;
   /** Records skipped due to malformed timestamps or missing required fields */
   skipped: number;
-  /** Alias for malformed records skipped (Step 2 naming) */
+  /** Malformed records skipped */
   skipped_malformed_count: number;
   /** Processing status for this source */
   status: 'ok' | 'success' | 'error' | 'skipped';
