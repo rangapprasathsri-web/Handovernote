@@ -6,9 +6,11 @@ import { GenerationResultView } from '../components/GenerationResultView.js';
 import { ShiftWindowForm } from '../components/ShiftWindowForm.js';
 import { SourceInspector } from '../components/SourceInspector.js';
 import { HandoverHistoryView } from '../components/HandoverHistoryView.js';
+import { PastHandoversSection } from '../components/PastHandoversSection.js';
 import { REGISTERED_SOURCES } from '../config/sources.js';
 import { GenerationRequest, GenerationResult } from '../models/generation.js';
 import { SourceConfig } from '../models/sourceConfig.js';
+import { HandoverNote } from '../models/handover.js';
 import { UserProfile } from './LoginPage.js';
 import { CalculationBreakdownModal } from '../components/CalculationBreakdownModal.js';
 import {
@@ -32,11 +34,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [sources, setSources] = useState<SourceConfig[]>(REGISTERED_SOURCES);
   const [activeTab, setActiveTab] = useState<'generator' | 'history'>('generator');
   const [historyCount, setHistoryCount] = useState<number>(0);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState<number>(0);
   const [generationState, setGenerationState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string[]>([]);
   const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
+  const [auditTargetNote, setAuditTargetNote] = useState<HandoverNote | null>(null);
 
   const fetchHistoryCount = async () => {
     try {
@@ -81,6 +85,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       setGenerationState('success');
       setGenerationResult(result);
       fetchHistoryCount();
+      setHistoryRefreshKey((prev) => prev + 1);
     } catch (err) {
       setGenerationState('error');
       const apiErr = err as ApiError;
@@ -102,6 +107,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setErrorDetails([]);
   };
 
+  const handleSelectPastHandover = (note: HandoverNote) => {
+    setGenerationState('success');
+    setErrorMessage(null);
+    setErrorDetails([]);
+    setGenerationResult({
+      status: 'ready',
+      fingerprint: note.fingerprint,
+      generated_at: note.generated_at,
+      handover_note: note,
+      source_stats: note.source_stats || [],
+      warnings: note.warnings || [],
+    });
+  };
+
+  const handleOpenAuditForNote = (note: HandoverNote) => {
+    setAuditTargetNote(note);
+    setIsAuditModalOpen(true);
+  };
+
   return (
     <AppShell
       activeTab={activeTab}
@@ -110,7 +134,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       onNavigateToLanding={onNavigateToLanding}
       currentUser={currentUser}
       onSignOut={onSignOut}
-      onOpenCalcAudit={() => setIsAuditModalOpen(true)}
+      onOpenCalcAudit={() => {
+        setAuditTargetNote(null);
+        setIsAuditModalOpen(true);
+      }}
     >
       {activeTab === 'history' ? (
         <HandoverHistoryView onBackToGenerator={() => setActiveTab('generator')} />
@@ -155,6 +182,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
           )}
 
+          {/* Past Handovers Section: Live Firestore 'handover_notes' collection */}
+          <PastHandoversSection
+            onSelectHandover={handleSelectPastHandover}
+            activeFingerprint={generationResult?.handover_note?.fingerprint}
+            refreshTrigger={historyRefreshKey}
+            onOpenAuditModal={handleOpenAuditForNote}
+          />
+
           {/* Secondary Section: Source Data & Schema Contract Explorer */}
           <SourceInspector sources={sources} />
         </>
@@ -163,8 +198,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Global Calculation and Formula Audit Modal */}
       <CalculationBreakdownModal
         isOpen={isAuditModalOpen}
-        onClose={() => setIsAuditModalOpen(false)}
-        note={generationResult?.handover_note || null}
+        onClose={() => {
+          setIsAuditModalOpen(false);
+          setAuditTargetNote(null);
+        }}
+        note={auditTargetNote || generationResult?.handover_note || null}
       />
     </AppShell>
   );

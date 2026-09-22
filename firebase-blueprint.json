@@ -1,0 +1,21 @@
+{
+  "entities": {
+    "handover_notes": {
+      "fields": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "shift_window": { "type": "object" },
+        "timezone": { "type": "string" },
+        "sources": { "type": "array" },
+        "generated_at": { "type": "string" },
+        "fingerprint": { "type": "string" },
+        "note": { "type": "object" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "indexes": []
+  }
+}
