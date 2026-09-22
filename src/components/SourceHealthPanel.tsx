@@ -25,7 +25,7 @@ export const SourceHealthPanel: React.FC<SourceHealthPanelProps> = ({
   return (
     <div
       id="generation-details-panel"
-      className="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden"
+      className="glass-surface-subtle rounded-xl border border-white/80 shadow-xs overflow-hidden"
     >
       <button
         type="button"
@@ -33,7 +33,7 @@ export const SourceHealthPanel: React.FC<SourceHealthPanelProps> = ({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-controls="generation-details-content"
-        className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/70 transition-colors text-left cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-600"
+        className="w-full px-5 py-3.5 flex items-center justify-between bg-white/40 hover:bg-white/60 backdrop-blur-xs transition-colors text-left cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-600"
       >
         <div className="flex items-center gap-2.5">
           <Database className="w-4 h-4 text-slate-500" aria-hidden="true" />

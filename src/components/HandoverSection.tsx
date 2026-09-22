@@ -60,10 +60,10 @@ export const HandoverSection: React.FC<HandoverSectionProps> = ({ title, items }
     <section
       id={config.containerId}
       aria-label={title}
-      className="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden"
+      className="glass-surface-subtle rounded-xl border border-white/80 shadow-xs overflow-hidden"
     >
       {/* Section Header */}
-      <div className="px-5 py-3.5 bg-slate-50/70 border-b border-slate-200 flex items-center justify-between">
+      <div className="px-5 py-3.5 bg-white/40 backdrop-blur-xs border-b border-white/60 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           {config.icon}
           <h3 className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">

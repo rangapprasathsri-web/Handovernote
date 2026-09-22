@@ -114,10 +114,10 @@ export async function generateHandoverPdf(
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
 
-  // Standard fonts
-  const helvetica = await doc.embedFont(StandardFonts.Helvetica);
-  const helveticaBold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const helveticaOblique = await doc.embedFont(StandardFonts.HelveticaOblique);
+  // Standard fonts (Times New Roman)
+  const helvetica = await doc.embedFont(StandardFonts.TimesRoman);
+  const helveticaBold = await doc.embedFont(StandardFonts.TimesRomanBold);
+  const helveticaOblique = await doc.embedFont(StandardFonts.TimesRomanItalic);
 
   // Palette (accessible, professional slate/navy)
   const colorPrimary = rgb(0.08, 0.18, 0.36); // Deep slate navy

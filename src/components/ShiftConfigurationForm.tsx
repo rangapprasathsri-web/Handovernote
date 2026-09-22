@@ -116,8 +116,8 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-7 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+    <div className="glass-surface rounded-2xl p-6 sm:p-7 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100/80">
         <div>
           <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
             Shift window &amp; sources
@@ -134,7 +134,7 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
             id="preset-documented-btn"
             onClick={() => handleApplyPreset('documented')}
             disabled={isLoading}
-            className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-medium transition-colors cursor-pointer disabled:opacity-50"
+            className="text-xs px-3 py-1.5 rounded-lg bg-white/60 hover:bg-white/90 text-slate-700 font-semibold transition-all cursor-pointer disabled:opacity-50 border border-white/80 shadow-2xs backdrop-blur-xs"
             title="Reset to 2026-09-03 17:00 to 20:00 IST window"
           >
             Seeded Shift Window
@@ -143,7 +143,7 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
             type="button"
             onClick={() => handleApplyPreset('past8h')}
             disabled={isLoading}
-            className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-medium transition-colors cursor-pointer disabled:opacity-50"
+            className="text-xs px-3 py-1.5 rounded-lg bg-white/60 hover:bg-white/90 text-slate-700 font-semibold transition-all cursor-pointer disabled:opacity-50 border border-white/80 shadow-2xs backdrop-blur-xs"
           >
             8-Hour Window
           </button>
@@ -152,7 +152,7 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
             id="preset-quiet-shift-btn"
             onClick={() => handleApplyPreset('quiet')}
             disabled={isLoading}
-            className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors cursor-pointer disabled:opacity-50 border border-indigo-200/60"
+            className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50/70 hover:bg-indigo-100/90 text-indigo-700 font-semibold transition-all cursor-pointer disabled:opacity-50 border border-indigo-200/80 shadow-2xs backdrop-blur-xs"
             title="Demonstrate 0-activity quiet shift handling"
           >
             Quiet Shift (Empty)

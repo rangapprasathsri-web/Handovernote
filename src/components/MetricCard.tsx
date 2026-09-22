@@ -34,8 +34,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => (e.key === 'Enter' || e.key === ' ') && onClick() : undefined}
-      className={`p-4 bg-white rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between transition-all ${
-        onClick ? 'cursor-pointer hover:border-indigo-300 hover:shadow-sm group' : 'hover:border-slate-300'
+      className={`p-4 glass-card rounded-xl flex flex-col justify-between transition-all duration-200 ${
+        onClick ? 'cursor-pointer hover:border-indigo-300/90 hover:shadow-md group' : 'hover:border-white'
       }`}
     >
       <div className="flex items-center justify-between gap-2">

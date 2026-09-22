@@ -45,10 +45,10 @@ export const CalculationBreakdownModal: React.FC<CalculationBreakdownModalProps>
       role="dialog"
       aria-modal="true"
       aria-labelledby="calc-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
     >
       <div
-        className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8"
+        className="relative w-full max-w-4xl glass-modal rounded-2xl overflow-hidden my-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

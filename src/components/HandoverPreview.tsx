@@ -36,7 +36,7 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
   return (
     <div id="handover-preview-container" className="space-y-6">
       {/* Top Document Header & Actions Bar */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-7">
+      <div className="glass-surface rounded-2xl p-6 sm:p-7 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 pb-6 border-b border-slate-100">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -136,7 +136,7 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
         )}
 
         {/* Activity Overview Summary */}
-        <div className="mt-5 p-4 rounded-xl bg-slate-50/80 border border-slate-200/70">
+        <div className="mt-5 p-4 rounded-xl glass-surface-subtle border border-white/80 shadow-2xs">
           <span className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
             Operational Overview
           </span>

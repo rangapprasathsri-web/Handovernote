@@ -32,7 +32,7 @@ export const HandoverItem: React.FC<HandoverItemProps> = ({
   return (
     <article
       id={`handover-item-${item.source_system}-${item.record_id}`}
-      className={`p-4 rounded-xl bg-white border border-slate-200/80 hover:border-slate-300 transition-colors border-l-4 ${borderAccentColor} shadow-xs`}
+      className={`p-4 rounded-xl bg-white/75 backdrop-blur-xs border border-white/80 hover:bg-white/95 hover:border-white transition-all duration-200 border-l-4 ${borderAccentColor} shadow-2xs`}
     >
       {/* Narrative description (Visually dominant) */}
       <p className="text-slate-900 text-sm font-medium leading-relaxed break-words">

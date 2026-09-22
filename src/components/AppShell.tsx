@@ -36,11 +36,18 @@ export const AppShell: React.FC<AppShellProps> = ({
   onOpenCalcAudit,
 }) => {
   return (
-    <div className="min-h-screen bg-[#FBFBFA] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900 antialiased">
+    <div className="relative min-h-screen bg-slate-50/40 text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900 antialiased overflow-x-hidden">
+      {/* Ambient Glassmorphic Mesh Glows */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
+        <div className="absolute -top-[15%] -left-[10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-indigo-200/40 via-blue-100/35 to-transparent blur-3xl transform-gpu" />
+        <div className="absolute top-[25%] -right-[15%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-bl from-sky-200/35 via-teal-100/30 to-transparent blur-3xl transform-gpu" />
+        <div className="absolute -bottom-[15%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-violet-200/35 via-indigo-100/25 to-transparent blur-3xl transform-gpu" />
+      </div>
+
       {/* Top Application Bar */}
       <header
         role="banner"
-        className="bg-white border-b border-slate-200/90 sticky top-0 z-20 shadow-2xs"
+        className="glass-header sticky top-0 z-20"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
           {/* Left: Brand & Landing Link */}
@@ -69,7 +76,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   ShiftFlow
                 </span>
                 <span className="text-slate-300 font-light hidden sm:inline">/</span>
-                <span className="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                <span className="hidden sm:inline-block text-xs font-semibold px-2 py-0.5 rounded bg-white/60 text-slate-600 border border-white/80 backdrop-blur-xs">
                   Operations Handover
                 </span>
               </div>
@@ -83,7 +90,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                 type="button"
                 id="header-calculation-audit-btn"
                 onClick={onOpenCalcAudit}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 text-xs font-semibold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50/80 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200/80 text-xs font-semibold backdrop-blur-xs transition-colors cursor-pointer shadow-2xs"
                 title="Open mathematical calculations and formulas audit breakdown"
               >
                 <Calculator className="w-3.5 h-3.5 text-indigo-600" />
@@ -93,14 +100,14 @@ export const AppShell: React.FC<AppShellProps> = ({
             )}
 
             {onTabChange && (
-              <nav className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-medium">
+              <nav className="flex items-center glass-surface-subtle p-0.5 rounded-lg border border-white/70 text-xs font-medium">
                 <button
                   type="button"
                   id="tab-btn-generator"
                   onClick={() => onTabChange('generator')}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
                     activeTab === 'generator'
-                      ? 'bg-white text-blue-700 font-semibold shadow-2xs'
+                      ? 'bg-white/90 text-blue-700 font-semibold shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -113,7 +120,7 @@ export const AppShell: React.FC<AppShellProps> = ({
                   onClick={() => onTabChange('history')}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors cursor-pointer ${
                     activeTab === 'history'
-                      ? 'bg-white text-blue-700 font-semibold shadow-2xs'
+                      ? 'bg-white/90 text-blue-700 font-semibold shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -172,7 +179,7 @@ export const AppShell: React.FC<AppShellProps> = ({
       </main>
 
       {/* Footer */}
-      <footer role="contentinfo" className="border-t border-slate-200 bg-white/90 py-4 text-xs text-slate-500">
+      <footer role="contentinfo" className="border-t border-white/60 glass-header py-4 text-xs text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>ShiftFlow &bull; Structured handovers for operational teams</span>
           <span className="font-mono text-[11px] text-slate-400">

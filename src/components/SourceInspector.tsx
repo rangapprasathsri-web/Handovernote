@@ -34,7 +34,7 @@ export const SourceInspector: React.FC<SourceInspectorProps> = ({ sources }) => 
   return (
     <div
       id="source-fixtures-inspector"
-      className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs flex flex-col gap-4"
+      className="glass-surface-subtle rounded-2xl p-5 shadow-xs flex flex-col gap-4 border border-white/80"
     >
       <div
         className="flex items-center justify-between cursor-pointer select-none"
