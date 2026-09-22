@@ -14,10 +14,10 @@ export default function App() {
   const [currentView, setCurrentView] = useState<AppView>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.toLowerCase();
-      if (hash.includes('app') || hash.includes('generator')) return 'app';
+      if (hash.includes('landing') || hash.includes('home')) return 'landing';
       if (hash.includes('login') || hash.includes('signin')) return 'login';
     }
-    return 'landing';
+    return 'app';
   });
 
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
@@ -90,6 +90,14 @@ export default function App() {
       onSignIn={() => navigateTo('login', '#login')}
       onGetStarted={() => navigateTo('login', '#login')}
       onOpenApp={() => navigateTo('app', '#app')}
+      onContinueWithGoogle={() =>
+        handleLoginSuccess({
+          name: 'Rangaprasath Sri',
+          email: 'rangapprasathsri@gmail.com',
+          role: 'Operations Lead & SRE',
+          team: 'Platform Reliability (Tier 1)',
+        })
+      }
     />
   );
 }

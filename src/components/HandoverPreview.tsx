@@ -7,12 +7,15 @@ import {
   FileSpreadsheet,
   CheckCircle2,
   Calendar,
+  Calculator,
+  ShieldCheck,
 } from 'lucide-react';
 import { HandoverNote, HANDOVER_SECTIONS_ORDER } from '../models/handover.js';
 import { MetricCard } from './MetricCard.js';
 import { HandoverSection } from './HandoverSection.js';
 import { SourceHealthPanel } from './SourceHealthPanel.js';
 import { DownloadActions } from './DownloadActions.js';
+import { CalculationBreakdownModal } from './CalculationBreakdownModal.js';
 
 export interface HandoverPreviewProps {
   note: HandoverNote;
@@ -21,11 +24,14 @@ export interface HandoverPreviewProps {
 
 export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset }) => {
   const [exportError, setExportError] = useState<string | null>(null);
+  const [isCalcModalOpen, setIsCalcModalOpen] = useState(false);
 
   const isEmptyShift = note.metrics.records_represented === 0;
+  const hasUnavailableSources = note.source_stats.some((s) => s.status === 'error');
   const hasSourceFailures =
     note.metrics.sources_with_warnings > 0 ||
-    note.source_stats.some((s) => s.status === 'error' || (s.warnings && s.warnings.length > 0));
+    hasUnavailableSources ||
+    note.source_stats.some((s) => s.warnings && s.warnings.length > 0);
 
   return (
     <div id="handover-preview-container" className="space-y-6">
@@ -41,6 +47,16 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
               <span className="text-xs text-slate-500 font-mono">
                 Verification: {note.fingerprint}
               </span>
+              <button
+                type="button"
+                id="open-calculation-audit-btn"
+                onClick={() => setIsCalcModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 border border-slate-200 hover:border-indigo-200 transition-colors cursor-pointer"
+                title="View numerical formulas and mathematical breakdown"
+              >
+                <Calculator className="w-3 h-3 text-indigo-600" aria-hidden="true" />
+                Calculation Audit
+              </button>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
@@ -89,7 +105,7 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
           </div>
         )}
 
-        {/* Non-blocking Partial Source Warning Banner */}
+        {/* Non-blocking Partial Source / Input Validation Warning Banner */}
         {hasSourceFailures && (
           <div
             id="source-retrieval-warning-banner"
@@ -97,13 +113,25 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
             className="mt-4 p-4 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5"
           >
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
-            <div>
-              <p className="font-semibold text-sm">Some source data could not be retrieved</p>
+            <div className="flex-1">
+              <p className="font-semibold text-sm">
+                {hasUnavailableSources
+                  ? 'Some source data could not be retrieved'
+                  : 'Resilient Input Validation: Upstream malformed records safely isolated'}
+              </p>
               <p className="mt-0.5 text-amber-800 leading-relaxed">
-                The note includes all available sources. You can inspect detailed warning logs in the
-                Generation details panel below.
+                {hasUnavailableSources
+                  ? 'The note includes all available sources. You can inspect detailed warning logs in the Generation details panel below.'
+                  : 'All configured sources responded successfully. Individual malformed records lacking valid timestamps were skipped to preserve report integrity.'}
               </p>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsCalcModalOpen(true)}
+              className="text-xs font-semibold text-indigo-700 hover:text-indigo-900 bg-white/80 px-2.5 py-1 rounded border border-amber-300 hover:bg-white transition-colors cursor-pointer shrink-0"
+            >
+              Audit Details
+            </button>
           </div>
         )}
 
@@ -124,24 +152,32 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
             label="Events in shift"
             value={note.metrics.events_in_shift}
             variant="primary"
+            helperText="Click to view interval formula"
+            onClick={() => setIsCalcModalOpen(true)}
           />
           <MetricCard
             id="metric-records-represented"
             label="Records represented"
             value={note.metrics.records_represented}
             variant="default"
+            helperText="Distinct operational entities"
+            onClick={() => setIsCalcModalOpen(true)}
           />
           <MetricCard
             id="metric-updates-consolidated"
             label="Updates consolidated"
             value={note.metrics.updates_consolidated}
             variant="neutral"
+            helperText="State noise reduction"
+            onClick={() => setIsCalcModalOpen(true)}
           />
           <MetricCard
             id="metric-source-warnings"
             label="Source warnings"
             value={note.metrics.sources_with_warnings}
             variant={note.metrics.sources_with_warnings > 0 ? 'warning' : 'default'}
+            helperText={note.metrics.sources_with_warnings > 0 ? 'Fault isolation active' : 'All systems healthy'}
+            onClick={() => setIsCalcModalOpen(true)}
           />
         </div>
       </div>
@@ -184,6 +220,13 @@ export const HandoverPreview: React.FC<HandoverPreviewProps> = ({ note, onReset 
         warnings={note.warnings}
         fingerprint={note.fingerprint}
         generatedAt={note.generated_at}
+      />
+
+      {/* Calculation & Formula Audit Modal */}
+      <CalculationBreakdownModal
+        isOpen={isCalcModalOpen}
+        onClose={() => setIsCalcModalOpen(false)}
+        note={note}
       />
     </div>
   );

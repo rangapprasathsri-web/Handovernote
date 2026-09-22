@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Database, ChevronDown, ChevronRight, Tag, User } from 'lucide-react';
 import { SourceConfig } from '../models/sourceConfig.js';
+import { apiGetSourcePreview } from '../services/apiClient.js';
 
 interface SourceInspectorProps {
   sources: SourceConfig[];
@@ -17,10 +18,9 @@ export const SourceInspector: React.FC<SourceInspectorProps> = ({ sources }) => 
     const fetchPreview = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/sources/${selectedSourceId}/preview`);
-        if (res.ok) {
-          const json = await res.json();
-          setPreviewData(json.sample || []);
+        const json = await apiGetSourcePreview(selectedSourceId);
+        if (json) {
+          setPreviewData(json.sample || json.sample_records || []);
         }
       } catch (err) {
         console.error('Failed to load source preview', err);

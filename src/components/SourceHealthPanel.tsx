@@ -15,9 +15,12 @@ export const SourceHealthPanel: React.FC<SourceHealthPanelProps> = ({
   fingerprint,
   generatedAt,
 }) => {
-  const hasWarnings = warnings.length > 0 || sourceStats.some((s) => s.status === 'error' || s.warnings?.length > 0);
-  // Auto-expand if warnings exist so it's discoverable, collapsed by default if healthy
-  const [isOpen, setIsOpen] = useState(hasWarnings);
+  const operationalWarnings = warnings.filter((w) => w.level === 'warning' || w.level === 'error');
+  const auditLogs = warnings.filter((w) => w.level === 'info');
+  const hasErrors = sourceStats.some((s) => s.status === 'error');
+  
+  // Default to collapsed for clean presentation, expand if a full source error occurred
+  const [isOpen, setIsOpen] = useState(hasErrors);
 
   return (
     <div
@@ -38,10 +41,10 @@ export const SourceHealthPanel: React.FC<SourceHealthPanelProps> = ({
           <span className="text-xs text-slate-500 hidden sm:inline">
             Source system health and record counts
           </span>
-          {hasWarnings && (
+          {operationalWarnings.length > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
               <AlertTriangle className="w-3 h-3" />
-              {warnings.length} warning{warnings.length === 1 ? '' : 's'}
+              {operationalWarnings.length} warning{operationalWarnings.length === 1 ? '' : 's'}
             </span>
           )}
         </div>
@@ -123,13 +126,18 @@ export const SourceHealthPanel: React.FC<SourceHealthPanelProps> = ({
           </div>
 
           {/* Warnings List */}
-          {warnings.length > 0 && (
+          {operationalWarnings.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-                Operational Warnings ({warnings.length})
-              </h4>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                  Fault Isolation &amp; Operational Warnings ({operationalWarnings.length})
+                </h4>
+                <span className="text-[11px] text-amber-800 font-medium">
+                  Pipeline auto-isolated non-standard records
+                </span>
+              </div>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                {warnings.map((w, idx) => (
+                {operationalWarnings.map((w, idx) => (
                   <div
                     key={idx}
                     className="p-3 rounded-lg bg-amber-50/70 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5"
@@ -137,15 +145,40 @@ export const SourceHealthPanel: React.FC<SourceHealthPanelProps> = ({
                     <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold">{w.code}</span>
+                        <span className="font-semibold">
+                          {w.code === 'RECORD_SKIPPED_MALFORMED' ? 'MALFORMED_RECORD_SKIPPED' : w.code}
+                        </span>
                         {w.source && (
                           <span className="text-[10px] uppercase font-mono px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded">
                             {w.source}
                           </span>
                         )}
+                        <span className="text-[10px] text-amber-700 font-medium">
+                          (Fault-Isolated)
+                        </span>
                       </div>
                       <p className="mt-0.5 text-amber-800 font-sans leading-relaxed">{w.message}</p>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Audit Logs if any */}
+          {auditLogs.length > 0 && (
+            <div>
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                Pipeline Audit Trail ({auditLogs.length})
+              </h4>
+              <div className="space-y-1.5">
+                {auditLogs.map((log, idx) => (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-center justify-between font-mono"
+                  >
+                    <span>{log.message}</span>
+                    <span className="text-[10px] text-slate-400">{log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : ''}</span>
                   </div>
                 ))}
               </div>

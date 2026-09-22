@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   AlertCircle,
   KeyRound,
+  Chrome,
 } from 'lucide-react';
 
 export interface UserProfile {
@@ -33,6 +34,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = useState(false);
 
@@ -61,6 +63,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         team: 'Platform Reliability (Tier 1)',
       });
     }, 450);
+  };
+
+  const handleGoogleSignIn = () => {
+    setIsGoogleLoading(true);
+    setErrorMessage(null);
+
+    setTimeout(() => {
+      setIsGoogleLoading(false);
+      onLoginSuccess({
+        name: 'Rangaprasath Sri',
+        email: 'rangapprasathsri@gmail.com',
+        role: 'Operations Lead & SRE',
+        team: 'Platform Reliability (Tier 1)',
+      });
+    }, 400);
   };
 
   const handleQuickDemoFill = (type: 'lead' | 'supervisor') => {
@@ -124,7 +141,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <div className="mb-5 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-start justify-between gap-2">
               <div>
                 <span className="font-semibold block mb-0.5">Enterprise Password Reset</span>
-                <span>Contact your IT/IdP administrator or use Single Sign-On below.</span>
+                <span>Contact your IT/IdP administrator or use Continue with Google below.</span>
               </div>
               <button
                 type="button"
@@ -135,6 +152,28 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               </button>
             </div>
           )}
+
+          {/* Continue with Google Option */}
+          <button
+            type="button"
+            id="continue-with-google-btn"
+            onClick={handleGoogleSignIn}
+            disabled={isLoading || isGoogleLoading}
+            className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 active:bg-slate-100 text-slate-800 text-xs sm:text-sm font-semibold rounded-lg border border-slate-300 hover:border-slate-400 shadow-2xs transition-all cursor-pointer flex items-center justify-center gap-2.5 disabled:opacity-75 mb-5 group"
+          >
+            <Chrome className="w-4 h-4 text-blue-600 shrink-0 group-hover:scale-110 transition-transform" />
+            <span>{isGoogleLoading ? 'Connecting with Google...' : 'Continue with Google'}</span>
+          </button>
+
+          {/* Divider */}
+          <div className="relative mb-5 text-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200"></div>
+            </div>
+            <span className="relative bg-white px-3 text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              Or continue with email
+            </span>
+          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -231,27 +270,39 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <div className="w-full border-t border-slate-200"></div>
             </div>
             <span className="relative bg-white px-3 text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-              Or single sign-on
+              Or Enterprise Identity
             </span>
           </div>
 
-          {/* Enterprise SSO Button */}
-          <button
-            type="button"
-            id="login-sso-btn"
-            onClick={() => {
-              onLoginSuccess({
-                name: 'Alex Turner',
-                email: 'alex.turner@enterprise-ops.io',
-                role: 'Lead Operations Engineer',
-                team: 'Platform Reliability (Tier 1)',
-              });
-            }}
-            className="w-full py-2.5 px-4 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer flex items-center justify-center gap-2"
-          >
-            <Shield className="w-4 h-4 text-slate-500" />
-            <span>Sign in with Enterprise SSO (Okta / Google)</span>
-          </button>
+          {/* Enterprise Identity Options */}
+          <div className="space-y-2">
+            <button
+              type="button"
+              id="login-google-workspace-btn"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading || isGoogleLoading}
+              className="w-full py-2 px-4 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold rounded-lg shadow-2xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Chrome className="w-4 h-4 text-blue-600" />
+              <span>Continue with Google Workspace</span>
+            </button>
+            <button
+              type="button"
+              id="login-sso-btn"
+              onClick={() => {
+                onLoginSuccess({
+                  name: 'Alex Turner',
+                  email: 'alex.turner@enterprise-ops.io',
+                  role: 'Lead Operations Engineer',
+                  team: 'Platform Reliability (Tier 1)',
+                });
+              }}
+              className="w-full py-2 px-4 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs sm:text-sm font-medium rounded-lg shadow-2xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Shield className="w-4 h-4 text-slate-400" />
+              <span>Sign in with Okta / SAML</span>
+            </button>
+          </div>
 
           {/* 1-Click Demo Profiles */}
           <div className="mt-6 pt-5 border-t border-slate-100">

@@ -10,6 +10,13 @@ import { REGISTERED_SOURCES } from '../config/sources.js';
 import { GenerationRequest, GenerationResult } from '../models/generation.js';
 import { SourceConfig } from '../models/sourceConfig.js';
 import { UserProfile } from './LoginPage.js';
+import { CalculationBreakdownModal } from '../components/CalculationBreakdownModal.js';
+import {
+  apiGenerateHandover,
+  apiListSources,
+  apiGetHistoryCount,
+  ApiError,
+} from '../services/apiClient.js';
 
 export interface DashboardProps {
   onNavigateToLanding?: () => void;
@@ -29,31 +36,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string[]>([]);
   const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState<boolean>(false);
 
   const fetchHistoryCount = async () => {
     try {
-      const res = await fetch('/api/handovers?limit=1');
-      if (res.ok) {
-        const data = await res.json();
-        if (typeof data.total === 'number') {
-          setHistoryCount(data.total);
-        }
-      }
+      const count = await apiGetHistoryCount();
+      setHistoryCount(count);
     } catch {
       // Non-critical
     }
   };
 
   useEffect(() => {
-    // Attempt to load live sources from server
+    // Attempt to load live sources from server, falling back to registered fixtures
     const fetchSources = async () => {
       try {
-        const res = await fetch('/api/sources');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data.sources) && data.sources.length > 0) {
-            setSources(data.sources);
-          }
+        const loadedSources = await apiListSources();
+        if (Array.isArray(loadedSources) && loadedSources.length > 0) {
+          setSources(loadedSources);
         }
       } catch {
         // Fallback to imported default config
@@ -61,6 +61,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
     };
     fetchSources();
     fetchHistoryCount();
+
+    // Auto-generate seeded shift handover note so demo is instant and ready
+    handleGenerate({
+      shift_start: '2026-09-03T17:00:00+05:30',
+      shift_end: '2026-09-03T20:00:00+05:30',
+      timezone: 'Asia/Kolkata',
+      sources: ['ticketing', 'incidents'],
+    });
   }, []);
 
   const handleGenerate = async (request: GenerationRequest) => {
@@ -69,32 +77,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setErrorDetails([]);
 
     try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setGenerationState('error');
-        setErrorMessage(data.error || 'Request validation error');
-        setErrorDetails(Array.isArray(data.details) ? data.details : [data.error || 'Unknown error']);
-        setGenerationResult(null);
-        return;
-      }
-
+      const result = await apiGenerateHandover(request);
       setGenerationState('success');
-      setGenerationResult(data as GenerationResult);
+      setGenerationResult(result);
       fetchHistoryCount();
     } catch (err) {
       setGenerationState('error');
-      const msg = err instanceof Error ? err.message : 'Network error communicating with server';
+      const apiErr = err as ApiError;
+      const msg = apiErr instanceof Error ? apiErr.message : 'Unable to complete handover note generation';
       setErrorMessage(msg);
-      setErrorDetails([msg]);
+      setErrorDetails(
+        Array.isArray(apiErr.details) && apiErr.details.length > 0
+          ? apiErr.details
+          : [msg]
+      );
       setGenerationResult(null);
     }
   };
@@ -114,6 +110,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       onNavigateToLanding={onNavigateToLanding}
       currentUser={currentUser}
       onSignOut={onSignOut}
+      onOpenCalcAudit={() => setIsAuditModalOpen(true)}
     >
       {activeTab === 'history' ? (
         <HandoverHistoryView onBackToGenerator={() => setActiveTab('generator')} />
@@ -162,6 +159,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <SourceInspector sources={sources} />
         </>
       )}
+
+      {/* Global Calculation and Formula Audit Modal */}
+      <CalculationBreakdownModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        note={generationResult?.handover_note || null}
+      />
     </AppShell>
   );
 };

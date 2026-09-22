@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FileDown, RotateCcw, Check, AlertCircle } from 'lucide-react';
 import { HandoverNote } from '../models/handover.js';
-import { generateHandoverFilename } from '../services/pdfService.js';
+import { apiDownloadHandoverPdf } from '../services/apiClient.js';
 
 export interface DownloadActionsProps {
   note: HandoverNote | null;
@@ -26,34 +26,7 @@ export const DownloadActions: React.FC<DownloadActionsProps> = ({
     setIsSuccess(false);
 
     try {
-      const response = await fetch('/api/handover/pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(note),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const msg = errorData.details?.[0] || errorData.error || `Server returned HTTP ${response.status}`;
-        throw new Error(msg);
-      }
-
-      const blob = await response.blob();
-      if (blob.size === 0) {
-        throw new Error('Received empty PDF document from server');
-      }
-
-      const url = window.URL.createObjectURL(blob);
-      const filename = generateHandoverFilename(note);
-
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
+      await apiDownloadHandoverPdf(note);
       setIsSuccess(true);
       setTimeout(() => setIsSuccess(false), 4000);
     } catch (err) {

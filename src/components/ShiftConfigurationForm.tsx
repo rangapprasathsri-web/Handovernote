@@ -35,10 +35,16 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
   const shiftStartIso = buildIsoWithTimezone(shiftStartLocal, timezone);
   const shiftEndIso = buildIsoWithTimezone(shiftEndLocal, timezone);
 
-  const handleApplyPreset = (preset: 'documented' | 'past8h') => {
+  const handleApplyPreset = (preset: 'documented' | 'past8h' | 'quiet') => {
     if (preset === 'documented') {
       setShiftStartLocal('2026-09-03T17:00');
       setShiftEndLocal('2026-09-03T20:00');
+      setTimezone('Asia/Kolkata');
+      setSelectedSources(['ticketing', 'incidents']);
+      setFieldErrors({});
+    } else if (preset === 'quiet') {
+      setShiftStartLocal('2026-09-03T06:00');
+      setShiftEndLocal('2026-09-03T08:00');
       setTimezone('Asia/Kolkata');
       setSelectedSources(['ticketing', 'incidents']);
       setFieldErrors({});
@@ -122,7 +128,7 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
         </div>
 
         {/* Quick window preset buttons */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
             type="button"
             id="preset-documented-btn"
@@ -140,6 +146,16 @@ export const ShiftConfigurationForm: React.FC<ShiftConfigurationFormProps> = ({
             className="text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-slate-700 font-medium transition-colors cursor-pointer disabled:opacity-50"
           >
             8-Hour Window
+          </button>
+          <button
+            type="button"
+            id="preset-quiet-shift-btn"
+            onClick={() => handleApplyPreset('quiet')}
+            disabled={isLoading}
+            className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors cursor-pointer disabled:opacity-50 border border-indigo-200/60"
+            title="Demonstrate 0-activity quiet shift handling"
+          >
+            Quiet Shift (Empty)
           </button>
         </div>
       </div>

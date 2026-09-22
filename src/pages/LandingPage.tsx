@@ -15,18 +15,21 @@ import {
   Terminal,
   ArrowDown,
   X,
+  Chrome,
 } from 'lucide-react';
 
 export interface LandingPageProps {
   onSignIn: () => void;
   onGetStarted: () => void;
   onOpenApp: () => void;
+  onContinueWithGoogle?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onSignIn,
   onGetStarted,
   onOpenApp,
+  onContinueWithGoogle,
 }) => {
   const [docModalOpen, setDocModalOpen] = useState(false);
 
@@ -134,10 +137,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
+                <button
+                  type="button"
+                  id="hero-google-btn"
+                  onClick={onContinueWithGoogle || onSignIn}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-slate-800 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
+                >
+                  <Chrome className="w-4 h-4 text-blue-600" />
+                  <span>Continue with Google</span>
+                </button>
+
                 <a
                   href="#product"
                   id="hero-viewproduct-btn"
-                  className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition-colors"
+                  className="inline-flex items-center justify-center px-4 py-3 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
                 >
                   View Product
                 </a>
@@ -843,15 +856,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-base sm:text-lg text-slate-600 mb-8">
               Generate a structured handover from real operational activity.
             </p>
-            <button
-              type="button"
-              id="cta-generatehandover-btn"
-              onClick={onOpenApp}
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer"
-            >
-              <span>Generate Handover</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                id="cta-generatehandover-btn"
+                onClick={onOpenApp}
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer"
+              >
+                <span>Generate Handover</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                id="cta-google-btn"
+                onClick={onContinueWithGoogle || onSignIn}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-slate-800 hover:text-slate-950 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
+              >
+                <Chrome className="w-4 h-4 text-blue-600" />
+                <span>Continue with Google</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>

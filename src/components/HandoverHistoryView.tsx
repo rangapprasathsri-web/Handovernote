@@ -14,6 +14,10 @@ import { HandoverHistoryRecord } from '../models/history.js';
 import { HandoverNote } from '../models/handover.js';
 import { HandoverPreview } from './HandoverPreview.js';
 import { DownloadActions } from './DownloadActions.js';
+import {
+  apiListHandoverHistory,
+  apiGetHandoverById,
+} from '../services/apiClient.js';
 
 export interface HandoverHistoryViewProps {
   onBackToGenerator?: () => void;
@@ -34,18 +38,7 @@ export const HandoverHistoryView: React.FC<HandoverHistoryViewProps> = ({
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      const params = new URLSearchParams();
-      params.set('page', String(page));
-      params.set('limit', '20');
-      if (filterSource.trim()) {
-        params.set('source', filterSource.trim());
-      }
-
-      const res = await fetch(`/api/handovers?${params.toString()}`);
-      if (!res.ok) {
-        throw new Error(`Failed to load history (HTTP ${res.status})`);
-      }
-      const data = await res.json();
+      const data = await apiListHandoverHistory(page, 20, filterSource);
       setHistoryItems(Array.isArray(data.items) ? data.items : []);
       setTotal(typeof data.total === 'number' ? data.total : 0);
     } catch (err) {
@@ -66,9 +59,8 @@ export const HandoverHistoryView: React.FC<HandoverHistoryViewProps> = ({
     }
 
     try {
-      const res = await fetch(`/api/handovers/${record.id}`);
-      if (!res.ok) throw new Error('Failed to fetch handover details');
-      const note = await res.json();
+      const note = await apiGetHandoverById(record.id);
+      if (!note) throw new Error('Failed to fetch handover details');
       setSelectedNote(note);
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Failed to load selected handover');

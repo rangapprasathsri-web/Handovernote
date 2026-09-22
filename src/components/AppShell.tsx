@@ -6,6 +6,7 @@ import {
   User,
   LogOut,
   ChevronRight,
+  Calculator,
 } from 'lucide-react';
 
 export interface AppShellProps {
@@ -21,6 +22,7 @@ export interface AppShellProps {
     team?: string;
   } | null;
   onSignOut?: () => void;
+  onOpenCalcAudit?: () => void;
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -31,6 +33,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   onNavigateToLanding,
   currentUser,
   onSignOut,
+  onOpenCalcAudit,
 }) => {
   return (
     <div className="min-h-screen bg-[#FBFBFA] text-slate-900 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900 antialiased">
@@ -75,6 +78,20 @@ export const AppShell: React.FC<AppShellProps> = ({
 
           {/* Center/Right Nav: Tabs & User Profile */}
           <div className="flex items-center gap-3">
+            {onOpenCalcAudit && (
+              <button
+                type="button"
+                id="header-calculation-audit-btn"
+                onClick={onOpenCalcAudit}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 text-xs font-semibold transition-colors cursor-pointer"
+                title="Open mathematical calculations and formulas audit breakdown"
+              >
+                <Calculator className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="hidden sm:inline">Formulas &amp; Audit</span>
+                <span className="sm:hidden">Audit</span>
+              </button>
+            )}
+
             {onTabChange && (
               <nav className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-medium">
                 <button
